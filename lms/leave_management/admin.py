@@ -1,8 +1,7 @@
 from django.contrib import admin
-from .models import *
+from leave_management.models import *
 # Register your models here.
 
-admin.site.register(User)
 admin.site.register(LeaveType)
 admin.site.register(LeaveBalance)
 admin.site.register(LeaveRequest)

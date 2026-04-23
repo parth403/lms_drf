@@ -1,30 +1,14 @@
 from django.shortcuts import render
-from rest_framework_simplejwt.views import TokenObtainPairView
-from .serializers import MyTokenObtainPairSerializer
 from rest_framework import viewsets
-from .models import User,LeaveRequest,LeaveLog
-from .serializers import UserSerializer,LeaveRequestSerializer,LeaveLogSerializer
+from leave_management.models import LeaveRequest,LeaveLog,LeaveBalance
+from .serializers import LeaveRequestSerializer,LeaveLogSerializer,LeaveBalanceSerializer
 from rest_framework import generics
-from rest_framework.permissions import IsAdminUser,IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 # Create your views here.
 
-class MyTokenObtainPairView(TokenObtainPairView):
-    serializer_class=MyTokenObtainPairSerializer
-
-class UserListViewSet(viewsets.ModelViewSet):
-    permission_classes=[IsAuthenticated]
-    queryset=User.objects.all()
-    serializer_class=UserSerializer
-
-    def get_queryset(self):
-        qs = super().get_queryset()
-        if self.request.user.role=='Admin':
-            qs = qs.all()
-        elif self.request.user.role=='Manager':
-            qs = qs.filter(role='Employee')
-        elif self.request.user.role=='Employee':
-            qs = qs.filter(id=self.request.user.id)
-        return qs
+class LeaveRequestCreateView(generics.CreateAPIView):
+    queryset=LeaveRequest.objects.all()
+    serializer_class=LeaveRequestSerializer
 
 class LeaveRequestView(generics.RetrieveUpdateDestroyAPIView):
     queryset=LeaveRequest.objects.all()
@@ -34,4 +18,9 @@ class LeaveRequestView(generics.RetrieveUpdateDestroyAPIView):
 class LeaveLogView(generics.ListAPIView):
     queryset=LeaveLog.objects.all()
     serializer_class=LeaveLogSerializer
+    permission_classes=[IsAuthenticated]
+
+class LeaveBalanceView(generics.ListAPIView):
+    queryset=LeaveBalance.objects.all()
+    serializer_class=LeaveBalanceSerializer
     permission_classes=[IsAuthenticated]
