@@ -1,11 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from lms.common.constants import ROLE_CHOICES,ROLE_EMPLOYEE
 # Create your models here.
 
 class User(AbstractUser):
-    ROLE_CHOICES=(
-        ('Employee','employee'),
-        ('Manager','manager'),
-        ('Admin','admin')
-    )
-    role=models.CharField(max_length=30,choices=ROLE_CHOICES)
+    role=models.CharField(max_length=30,choices=ROLE_CHOICES,default=ROLE_EMPLOYEE)

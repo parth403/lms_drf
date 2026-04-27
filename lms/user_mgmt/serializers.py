@@ -1,19 +1,21 @@
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+#from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
 from user_mgmt.models import User
+from leave_management.serializers import LeaveBalanceSerializer
 
-class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
-    @classmethod
-    def get_token(cls, user):
-        token = super().get_token(user)
-        token['username'] = user.username
-        token['role'] = user.role
-        return token
+# class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+#     @classmethod
+#     def get_token(cls, user):
+#         token = super().get_token(user)
+#         token['username'] = user.username
+#         token['role'] = user.role
+#         return token
     
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model=User
         fields=['id','username','email','role']
+        ordering=['id']
 
 class RegisterSerializer(serializers.ModelSerializer):
     password=serializers.CharField(write_only=True)
@@ -44,7 +46,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         )
         return user
 
-
 class LoginSerializer(serializers.Serializer):
     username=serializers.CharField(required=True)
     password=serializers.CharField(required=True)
@@ -66,3 +67,21 @@ class LoginSerializer(serializers.Serializer):
         attrs['user']=user
         return attrs
 
+class LogoutSerializer(serializers.Serializer):
+    refresh=serializers.CharField(required=True)
+    def validate(self, attrs):
+        self.token=attrs['refresh']
+        return attrs
+    
+    def save(self):
+        from rest_framework_simplejwt.tokens import RefreshToken
+        try:
+            RefreshToken(self.token).blacklist()
+        except:
+            raise serializers.ValidationError('Wrong token')
+        
+class UserDetailSerializer(serializers.ModelSerializer):
+    leave_balances=LeaveBalanceSerializer(source='leavebalance_set',many=True,read_only=True)
+    class Meta:
+        model=User
+        fields=['id','username','email','role','leave_balances']

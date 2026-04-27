@@ -1,14 +1,137 @@
 from django.shortcuts import render
-from rest_framework import viewsets
-from leave_management.models import LeaveRequest,LeaveLog,LeaveBalance
-from .serializers import LeaveRequestSerializer,LeaveLogSerializer,LeaveBalanceSerializer
+from rest_framework import viewsets,status
+from leave_management.models import LeaveRequest,LeaveLog,LeaveBalance,LeaveType
+from .serializers import LeaveRequestSerializer,LeaveLogSerializer,LeaveBalanceSerializer,LeaveRequestCreateSerializer,LeaveRequestUpdateSerializer,LeaveTypeSerializer
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
+from leave_management.permissions import IsEmployee,IsManager,IsAdmin
+from django.db.models import Q
+from rest_framework.response import Response
+from lms.common.constants import (ROLE_CHOICES,ROLE_ADMIN,ROLE_EMPLOYEE,ROLE_MANAGER,STATUS_PENDING,STATUS_APPROVED,STATUS_REJECTED,ACTION_APPLIED)
+from rest_framework.views import APIView
 # Create your views here.
 
 class LeaveRequestCreateView(generics.CreateAPIView):
+    permission_classes=[IsAuthenticated]
+    serializer_class=LeaveRequestCreateSerializer
+
+    # Create log entry when user request for a leave
+    def perform_create(self,serializer):
+        leave_request=serializer.save(user=self.request.user,status=STATUS_PENDING)
+        LeaveLog.objects.create(leave_request=leave_request,action=ACTION_APPLIED,approved_by=self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        serializer=self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer) 
+
+        # get full details of leave request
+        leave_request=LeaveRequest.objects.get(id=serializer.data.get('id'))
+        detailed_serializer=LeaveRequestSerializer(leave_request)
+        return Response(detailed_serializer.data,status=status.HTTP_201_CREATED)
+
+
+class EmployeeLeaveRequestListView(generics.ListAPIView):
+    #Employee can views their own leave requests
+    serializer_class=LeaveRequestSerializer
+    permission_classes=[IsAuthenticated]
+
+    def get_queryset(self):
+        return LeaveRequest.objects.filter(user=self.request.user).order_by('-applied_at')
+
+
+class EmployeeLeaveRequestDetailView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class=LeaveRequestSerializer
+    #permission_classes=[IsAuthenticated]
+
+    def get_queryset(self):
+        return LeaveRequest.objects.filter(user=self.request.user)
+    
+    def update(self,instance,*args,**kwargs):
+        instance=self.get_object()
+        if instance.status != STATUS_PENDING:
+            return Response({'detail':'Only pending request you can change'},status=status.HTTP_400_BAD_REQUEST)
+        return super().update(instance,*args,**kwargs)
+        
+    def destroy(self,instance,*args,**kwargs):
+        instance=self.get_object()
+        if instance.status != STATUS_PENDING:
+            return Response({'detail':'Only pending request you can delete'},status=status.HTTP_400_BAD_REQUEST)
+        return super().destroy(instance,*args,**kwargs)
+
+
+class ManagerLeaveRequestListView(generics.ListAPIView):
+    """Manager can view pending leave requests"""
+    serializer_class=LeaveRequestSerializer
+    permission_classes=[IsAuthenticated]
+
+    def get_queryset(self):
+        return LeaveRequest.objects.filter(status=STATUS_PENDING).order_by('-applied_at')
+    
+
+class LeaveRequestApproveView(generics.RetrieveUpdateAPIView):
+    """Manage can approve or reject a request"""
     queryset=LeaveRequest.objects.all()
     serializer_class=LeaveRequestSerializer
+    #permission_classes=[IsAuthenticated]
+    
+    def update(self,request,*args,**kwargs):
+        instance=self.get_object()
+        
+        if instance.status!=STATUS_PENDING:
+            return Response({'detail':'Request already approved'},status=status.HTTP_400_BAD_REQUEST)
+        
+        new_status=request.data.get('status')
+        if new_status not in [STATUS_APPROVED,STATUS_REJECTED]:
+            return Response({'detail':'status must be approved or rejected'})
+        
+        instance.status=new_status
+        instance.approved_by=request.user
+        instance.save()
+
+        LeaveLog.objects.create(leave_request=instance,action=STATUS_APPROVED if new_status==STATUS_APPROVED else STATUS_REJECTED,
+                                approved_by=request.user)
+        
+        if new_status==STATUS_APPROVED:
+            #days_taken=(instance.end_date - instance.start_date)+1
+            leave_balance=LeaveBalance.objects.get(user=instance.user,leave_type=instance.leave_type)
+            #leave_balance.used_leaves+=days_taken
+            leave_balance.save()
+
+        serializer=LeaveRequestSerializer(instance)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
+class ManagerLeaveHistoryView(generics.ListAPIView):
+    serializer_class=LeaveRequestSerializer
+    permission_classes=[IsAuthenticated]
+
+    def get_queryset(self):
+        return LeaveRequest.objects.all().order_by('-applied_at')
+    
+
+class DashboardView(APIView):
+    permission_classes=[IsAuthenticated]
+
+    def get(self,request):
+        user=request.user
+
+        if user.role==ROLE_ADMIN:
+            pending_leaves=LeaveRequest.objects.filter(user=user,status=STATUS_PENDING).count()
+            approved_leaves=LeaveRequest.objects.filter(user=user,status=STATUS_APPROVED).count()
+            rejected_leaves=LeaveRequest.objects.filter(user=user,status=STATUS_REJECTED).count()
+
+            leave_balances=LeaveBalance.objects.filter(user=user)
+            return Response({'user':user.username,'role':user.role,'pending_leaves':pending_leaves,'approved_leaves':approved_leaves,'rejeced_leaves':rejected_leaves},status=status.HTTP_200_OK)
+
+        elif user.role in [ROLE_MANAGER,ROLE_EMPLOYEE]:
+            pending_leaves=LeaveRequest.objects.filter(status=STATUS_PENDING).count()
+            approved_leaves=LeaveRequest.objects.filter(status=STATUS_APPROVED).count()
+            rejected_leaves=LeaveRequest.objects.filter(status=STATUS_REJECTED).count()
+
+            return Response({'user':user.username,'role':user.role,'pending_leaves':pending_leaves,'approved_leaves':approved_leaves,'rejected_leaves':rejected_leaves},status=status.HTTP_200_OK)
+        return Response({'detail':'user does not exists'},status=status.HTTP_400_BAD_REQUEST)        
+
+
 
 class LeaveRequestView(generics.RetrieveUpdateDestroyAPIView):
     queryset=LeaveRequest.objects.all()
@@ -16,11 +139,40 @@ class LeaveRequestView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes=[IsAuthenticated]
 
 class LeaveLogView(generics.ListAPIView):
-    queryset=LeaveLog.objects.all()
     serializer_class=LeaveLogSerializer
     permission_classes=[IsAuthenticated]
 
+    def get_queryset(self):
+        qs=LeaveLog.objects.all()
+        user_role=self.request.user.role
+
+        if user_role==ROLE_ADMIN:
+            return qs
+        elif user_role==ROLE_MANAGER:
+            filtered=qs.filter(Q(leave_request__user__role=ROLE_EMPLOYEE) | Q(leave_request__user__role=ROLE_MANAGER))
+            return filtered
+        elif user_role==ROLE_EMPLOYEE:
+            return qs.filter(leave_request__user=self.request.user)
+        else:
+            return qs.none()
+
+# class LeaveUserRequestView(viewsets.ModelViewSet):
+#     queryset=LeaveRequest.objects.all()
+#     serializer_class=LeaveRequestSerializer
+
+#     def get_serializer_class(self):
+#         pass
+
 class LeaveBalanceView(generics.ListAPIView):
-    queryset=LeaveBalance.objects.all()
     serializer_class=LeaveBalanceSerializer
     permission_classes=[IsAuthenticated]
+
+    def get_queryset(self):
+        return LeaveBalance.objects.filter(user=self.request.user)
+
+class LeaveTypeListView(generics.ListAPIView):
+    queryset=LeaveType.objects.all()
+    serializer_class=LeaveTypeSerializer
+    permission_classes=[IsAuthenticated]
+
+
