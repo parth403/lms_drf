@@ -21,7 +21,6 @@ class LeaveRequestSerializer(serializers.ModelSerializer):
     
 
     
-
 class LeaveRequestCreateSerializer(serializers.ModelSerializer):
     '''
     Serializer for creating a leave request 

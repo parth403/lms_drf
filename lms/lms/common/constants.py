@@ -20,13 +20,13 @@ LEAVE_TYPES=[
 ]
 
 
-STATUS_APPROVED='Approved'
-STATUS_REJECTED='Rejected'
+STATUS_APPROVED='approved'
+STATUS_REJECTED='rejected'
 STATUS_PENDING='pending'
 
 STATUS_TYPES=[
-    (STATUS_APPROVED,'approved'),
-    (STATUS_REJECTED,'rejected'),
+    (STATUS_APPROVED,'Approved'),
+    (STATUS_REJECTED,'Rejected'),
     (STATUS_PENDING,'Pending')
 ]
 

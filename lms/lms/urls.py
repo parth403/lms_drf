@@ -16,10 +16,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
+from lms import template_views
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('leave/',include('leave_management.urls')),
     path('user/',include('user_mgmt.urls')),
+
+    path('register/', template_views.register_page, name='register'),
+    path('login/',template_views.login_page, name='login'),
+    path('dashboard/',template_views.user_dashboard_page,name='dashboard'),
 ]
