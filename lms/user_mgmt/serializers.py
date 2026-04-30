@@ -83,6 +83,8 @@ class LogoutSerializer(serializers.Serializer):
         
 class UserDetailSerializer(serializers.ModelSerializer):
     leave_balances=LeaveBalanceSerializer(source='leavebalance_set',many=True,read_only=True)
+    firstName=serializers.CharField(source='first_name', read_only=True)
+    lastName=serializers.CharField(source='last_name', read_only=True)
     class Meta:
         model=User
-        fields=['id','username','email','role','leave_balances']
+        fields=['id','username','email','role','firstName','lastName','leave_balances']

@@ -887,9 +887,14 @@
         try {
             const token = localStorage.getItem('access_token');
             console.log('Token exists:', !!token);
+            console.log('Token value:', token ? token.substring(0, 20) + '...' : 'null');
             
             const response = await fetch('/user/profile/', {
-                headers: { 'Authorization': `Bearer ${token}` }
+                method: 'GET',
+                headers: { 
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
             });
             
             console.log('Profile response status:', response.status);
@@ -916,29 +921,54 @@
                 loadDashboardData();
                 toggleMenus();
             } else {
+                const errorData = await response.text();
+                console.log('Error response body:', errorData);
                 console.log('Error response:', response.status);
-                showAlert('Error loading user profile', 'danger');
+                showAlert('Error loading user profile: ' + response.status, 'danger');
             }
         } catch (error) {
             console.error('Error fetching user:', error);
-            showAlert('Connection error. Please refresh the page.', 'danger');
+            console.error('Error details:', error.message);
+            showAlert('Connection error: ' + error.message + '. Please refresh the page.', 'danger');
         }
     }
 
     function updateUserDisplay() {
-        const firstName = currentUser.firstName || currentUser.username;
-        const avatar = firstName.charAt(0).toUpperCase();
-        
-        document.getElementById('user-name').textContent = firstName;
-        document.getElementById('user-avatar').textContent = avatar;
-        document.getElementById('user-role').textContent = currentUser.role;
-        
-        // Profile section
-        document.getElementById('profile-username').value = currentUser.username || '';
-        document.getElementById('profile-email').value = currentUser.email || '';
-        document.getElementById('profile-first-name').value = currentUser.firstName || '';
-        document.getElementById('profile-last-name').value = currentUser.lastName || '';
-        document.getElementById('profile-role').value = currentUser.role || '';
+        try {
+            if (!currentUser) {
+                console.error('Current user is null');
+                return;
+            }
+            
+            const firstName = currentUser.firstName || currentUser.first_name || currentUser.username || 'User';
+            const lastName = currentUser.lastName || currentUser.last_name || '';
+            const avatar = firstName.charAt(0).toUpperCase();
+            
+            const userNameElement = document.getElementById('user-name');
+            const userAvatarElement = document.getElementById('user-avatar');
+            const userRoleElement = document.getElementById('user-role');
+            
+            if (userNameElement) userNameElement.textContent = firstName;
+            if (userAvatarElement) userAvatarElement.textContent = avatar;
+            if (userRoleElement) userRoleElement.textContent = currentUser.role || 'Employee';
+            
+            // Profile section
+            const profileUsername = document.getElementById('profile-username');
+            const profileEmail = document.getElementById('profile-email');
+            const profileFirstName = document.getElementById('profile-first-name');
+            const profileLastName = document.getElementById('profile-last-name');
+            const profileRole = document.getElementById('profile-role');
+            
+            if (profileUsername) profileUsername.value = currentUser.username || '';
+            if (profileEmail) profileEmail.value = currentUser.email || '';
+            if (profileFirstName) profileFirstName.value = firstName || '';
+            if (profileLastName) profileLastName.value = lastName || '';
+            if (profileRole) profileRole.value = currentUser.role || '';
+            
+            console.log('User display updated successfully');
+        } catch (error) {
+            console.error('Error updating user display:', error);
+        }
     }
 
     function toggleMenus() {
@@ -1025,18 +1055,24 @@
                 // Handle both array and paginated responses
                 const balanceList = Array.isArray(balances) ? balances : (balances.results || []);
                 balanceList.forEach(balance => {
-                    totalLeaves += balance.totalLeaves;
-                    usedLeaves += balance.usedLeaves;
+                    totalLeaves += balance.totalLeaves || 0;
+                    usedLeaves += balance.usedLeaves || 0;
                 });
                 
                 const remainingLeaves = totalLeaves - usedLeaves;
                 
-                document.getElementById('total-leaves-card').textContent = totalLeaves;
-                document.getElementById('used-leaves-card').textContent = usedLeaves;
-                document.getElementById('remaining-leaves-card').textContent = remainingLeaves;
+                const totalElement = document.getElementById('total-leaves-card');
+                const usedElement = document.getElementById('used-leaves-card');
+                const remainingElement = document.getElementById('remaining-leaves-card');
+                
+                if (totalElement) totalElement.textContent = totalLeaves;
+                if (usedElement) usedElement.textContent = usedLeaves;
+                if (remainingElement) remainingElement.textContent = remainingLeaves;
+            } else {
+                console.log('Error loading leave balance:', response.status);
             }
         } catch (error) {
-            console.error('Error loading leave balance:', error);
+            console.error('Error in loadEmployeeDashboard:', error);
         }
         
         // Load recent leaves

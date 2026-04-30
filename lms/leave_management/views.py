@@ -49,17 +49,17 @@ class EmployeeLeaveRequestDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         return LeaveRequest.objects.filter(user=self.request.user)
     
-    def update(self,instance,*args,**kwargs):
-        instance=self.get_object()
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
         if instance.status != STATUS_PENDING:
-            return Response({'detail':'Only pending request you can change'},status=status.HTTP_400_BAD_REQUEST)
-        return super().update(instance,*args,**kwargs)
+            return Response({'detail':'Only pending request you can change'}, status=status.HTTP_400_BAD_REQUEST)
+        return super().update(request, *args, **kwargs)
         
-    def destroy(self,instance,*args,**kwargs):
-        instance=self.get_object()
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
         if instance.status != STATUS_PENDING:
-            return Response({'detail':'Only pending request you can delete'},status=status.HTTP_400_BAD_REQUEST)
-        return super().destroy(instance,*args,**kwargs)
+            return Response({'detail':'Only pending request you can delete'}, status=status.HTTP_400_BAD_REQUEST)
+        return super().destroy(request, *args, **kwargs)
 
 
 class PendingLeaveListView(generics.ListAPIView):
