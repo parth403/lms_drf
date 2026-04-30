@@ -96,25 +96,48 @@ document.getElementById("loginForm").addEventListener("submit", async function(e
         password: document.getElementById("password").value
     };
 
-    const response = await fetch("/user/login/", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(data)
-    });
+    try {
+        console.log('Attempting login with username:', data.username);
+        
+        const response = await fetch("/user/login/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
 
-    const result = await response.json();
+        const result = await response.json();
+        console.log('Login response status:', response.status);
+        console.log('Login response:', result);
+        
+        const message = document.getElementById("message");
 
-    const message = document.getElementById("message");
-
-    if (response.ok) {
-        message.style.color = "green";
-        message.innerText = "Login Successful! Redirecting...";
-        window.location.href = "{% url 'dashboard' %}";
-    } else {
+        if (response.ok) {
+            // Save tokens to localStorage
+            console.log('Saving tokens to localStorage');
+            localStorage.setItem('access_token', result.access);
+            localStorage.setItem('refresh_token', result.refresh);
+            
+            console.log('Access token saved:', !!localStorage.getItem('access_token'));
+            
+            message.style.color = "green";
+            message.innerText = "Login Successful! Redirecting...";
+            
+            // Redirect to dashboard
+            setTimeout(() => {
+                console.log('Redirecting to dashboard');
+                window.location.href = "/dashboard/";
+            }, 1000);
+        } else {
+            message.style.color = "red";
+            message.innerText = result.detail || "Invalid username or password";
+        }
+    } catch (error) {
+        const message = document.getElementById("message");
+        console.error('Login error:', error);
         message.style.color = "red";
-        message.innerText = result.detail || "Invalid username or password";
+        message.innerText = "Error: " + error.message;
     }
 });
 </script>

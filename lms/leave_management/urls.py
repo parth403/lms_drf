@@ -15,7 +15,7 @@ urlpatterns=[
     path('leave-types/',views.LeaveTypeListView.as_view(),name='leave-type'),
 
     #leave-request Employee
-    path('leave-request-create/',views.LeaveRequestCreateView.as_view(),name='leave-requesr-create'),
+    path('leave-request-create/',views.LeaveRequestCreateView.as_view(),name='leave-request-create'),
     path('my-leaves/',views.EmployeeLeaveRequestListView.as_view(),name='my-all-requests'),
     path('my-leaves/<int:pk>',views.EmployeeLeaveRequestDetailView.as_view(),name='my-leave-requests'),
 

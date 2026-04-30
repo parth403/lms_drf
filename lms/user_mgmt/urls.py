@@ -15,6 +15,6 @@ urlpatterns=[
 
     #user management
     path('user-detail/',views.UserDetailView.as_view()),
+    path('profile/',views.UserDetailView.as_view()),
     path('users/',views.UserListViewSet.as_view({'get': 'list'}),name='user-list'),
-
 ]
