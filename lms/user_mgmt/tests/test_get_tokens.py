@@ -1,9 +1,9 @@
 import pytest
 from django.urls import reverse
 from rest_framework import status
-from lms.conftest import user
+from lms.conftest import employee
 
-def test_tokens_with_valid_credentials(client,user):
+def test_tokens_with_valid_credentials(client,employee):
     url=reverse('token_obtain_pair')
     data={
         "username":"jenis",
@@ -12,7 +12,7 @@ def test_tokens_with_valid_credentials(client,user):
     response=client.post(url,data)
     assert response.status_code==200
 
-def test_tokens_with_invalid_credentials(client,user):
+def test_tokens_with_invalid_credentials(client,employee):
     url=reverse('token_obtain_pair')
     data={
         "username":"dhruvil",
@@ -21,7 +21,7 @@ def test_tokens_with_invalid_credentials(client,user):
     response=client.post(url,data)
     assert response.status_code==401
 
-def test_tokens_with_no_data_or_credentials(client,user):
+def test_tokens_with_no_data_or_credentials(client,employee):
     url=reverse('token_obtain_pair')
     data={
         "username":"",

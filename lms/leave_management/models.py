@@ -28,7 +28,7 @@ class LeaveRequest(models.Model):
     leave_type=models.ForeignKey(LeaveType,on_delete=models.CASCADE)
     start_date=models.DateField()
     end_date=models.DateField()
-    reason=models.TextField()
+    reason=models.TextField(max_length=50)
     applied_at=models.DateTimeField(auto_now_add=True)
     status=models.CharField(max_length=30,choices=STATUS_TYPES,default=STATUS_PENDING)
     approved_by=models.ForeignKey(User,blank=True,null=True,on_delete=models.SET_NULL,related_name='leave_approval')

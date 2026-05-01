@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from rest_framework import viewsets,status
+from rest_framework.exceptions import ValidationError
 from leave_management.models import LeaveRequest,LeaveLog,LeaveBalance,LeaveType
 from .serializers import LeaveRequestSerializer,LeaveLogSerializer,LeaveBalanceSerializer,LeaveRequestCreateSerializer,LeaveTypeSerializer
 from rest_framework import generics
@@ -16,16 +17,37 @@ class LeaveRequestCreateView(generics.CreateAPIView):
     permission_classes=[IsAuthenticated]
     serializer_class=LeaveRequestCreateSerializer
 
-    # Create log entry when user request for a leave
+    # Create log entry when user request for a leave and adjust leave balance
     def perform_create(self,serializer):
         leave_request=serializer.save(user=self.request.user,status=STATUS_PENDING)
-        LeaveLog.objects.create(leave_request=leave_request,action=ACTION_APPLIED,approved_by=self.request.user)
-        send_leave_request_email.delay(leave_request.id)
+        leave_days=(leave_request.end_date - leave_request.start_date).days + 1
+
+        leave_balance, created = LeaveBalance.objects.get_or_create(
+            user=self.request.user,
+            leave_type=leave_request.leave_type,
+            defaults={
+                'total_leaves': leave_request.leave_type.max_leaves,
+                'used_leaves': 0
+            }
+        )
+
+        if leave_balance.remaining_leaves < leave_days:
+            raise ValidationError({'detail':'Insufficient leave balance'})
+
+        leave_balance.used_leaves += leave_days
+        leave_balance.save()
+
+        LeaveLog.objects.create(
+            leave_request=leave_request,
+            action=ACTION_APPLIED,
+            approved_by=self.request.user
+        )
+        #send_leave_request_email.delay(leave_request.id)
 
     def create(self, request, *args, **kwargs):
         serializer=self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer) 
+        self.perform_create(serializer)
 
         # get full details of leave request
         leave_request=LeaveRequest.objects.get(id=serializer.data.get('id'))

@@ -4,11 +4,21 @@ from user_mgmt.models import User
 from leave_management.models import LeaveType
 
 @pytest.fixture
-def user(db):
+def manager(db):
+    return User.objects.create_user(
+        username="john",
+        email='john@gmail.com',
+        password='john123',
+        role='manager'
+    )
+
+@pytest.fixture
+def employee(db):
     return User.objects.create_user(
         username="jenis",
         email="jenis@example.com",
-        password="jenis123"
+        password="jenis123",
+        role='employee'
     )
 
 @pytest.fixture

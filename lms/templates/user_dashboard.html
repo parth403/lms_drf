@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,786 +6,240 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Leave Management System - Dashboard</title>
 
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: white;
-            min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        .sidebar {
-            width: 260px;
-            min-height: 100vh;
-            background: rgb(3, 62, 82);
-            position: fixed;
-            left: 0;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-            overflow-y: auto;
-        }
-
-        .sidebar .nav-link {
-            color: rgba(255, 255, 255, 0.75) !important;
-            padding: 12px 20px !important;
-            border-left: 4px solid transparent;
-            transition: all 0.3s ease;
-            margin: 5px 0;
-        }
-
-        .sidebar .nav-link i {
-            margin-right: 10px;
-            width: 20px;
-        }
-
-        .sidebar .nav-link:hover,
-        .sidebar .nav-link.active {
-            color: #667eea !important;
-            background-color: rgba(255, 255, 255, 0.05);
-            border-left-color: #667eea;
-        }
-
-        .main-content {
-            margin-left: 260px;
-            padding: 30px 20px;
-            min-height: 100vh;
-        }
-
-        .topbar {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            margin-bottom: 35px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .topbar h4 {
-            color: #2c3e50;
-            font-weight: 700;
-            margin: 0;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 20px;
-            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
-        }
-
-        .content-section {
-            display: none;
-            animation: fadeIn 0.3s ease-in;
-        }
-
-        .content-section.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .stat-card {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            border-left: 5px solid;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-        }
-
-        .stat-card.primary {
-            border-left-color: #667eea;
-        }
-
-        .stat-card.warning {
-            border-left-color: #f39c12;
-        }
-
-        .stat-card.success {
-            border-left-color: #27ae60;
-        }
-
-        .stat-card.danger {
-            border-left-color: #e74c3c;
-        }
-
-        .stat-card h6 {
-            color: #95a5a6;
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin: 0 0 12px 0;
-        }
-
-        .stat-card h3 {
-            color: #2c3e50;
-            margin: 0;
-            font-weight: 700;
-        }
-
-        .stat-card i {
-            font-size: 18px;
-            margin-right: 5px;
-            opacity: 0.7;
-        }
-
-        .form-card, .card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            border: none;
-            transition: all 0.3s ease;
-        }
-
-        .card:hover {
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-        }
-
-        .form-card h5, .card h5 {
-            color: #2c3e50;
-            font-weight: 700;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #ecf0f1;
-        }
-
-        .form-group label {
-            color: #2c3e50;
-            font-weight: 600;
-            margin-bottom: 10px;
-            display: block;
-        }
-
-        .form-control, .form-select {
-            border-radius: 8px;
-            border: 2px solid #ecf0f1;
-            padding: 12px 15px;
-            transition: all 0.3s ease;
-        }
-
-        .form-control:focus, .form-select:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 8px;
-            padding: 12px 28px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            color: white;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
-            color: white;
-        }
-
-        .btn-primary:active {
-            transform: translateY(-1px);
-        }
-
-        .table-container {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            overflow: hidden;
-        }
-
-        .table {
-            margin-bottom: 0;
-        }
-
-        .table thead {
-            background: linear-gradient(135deg, #f8f9fa 0%, #ecf0f1 100%);
-            border-bottom: 2px solid #d5dbdb;
-        }
-
-        .table thead th {
-            color: #2c3e50;
-            font-weight: 700;
-            border: none;
-            padding: 18px 15px;
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .table tbody td {
-            padding: 15px;
-            vertical-align: middle;
-            border-color: #ecf0f1;
-            color: #34495e;
-        }
-
-        .table tbody tr:hover {
-            background-color: #f8f9fa;
-        }
-
-        .badge {
-            padding: 8px 14px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 11px;
-            text-transform: capitalize;
-            display: inline-block;
-        }
-
-        .badge.pending {
-            background-color: #fff3cd;
-            color: #856404;
-        }
-
-        .badge.approved {
-            background-color: #d4edda;
-            color: #155724;
-        }
-
-        .badge.rejected {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-
-        .action-btn {
-            padding: 8px 12px;
-            font-size: 12px;
-            margin: 2px;
-            border-radius: 6px;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            display: inline-block;
-        }
-
-        .action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
-        }
-
-        .action-btn-edit {
-            background-color: #3498db;
-            color: white;
-        }
-
-        .action-btn-delete {
-            background-color: #e74c3c;
-            color: white;
-        }
-
-        .action-btn-approve {
-            background-color: #27ae60;
-            color: white;
-        }
-
-        .action-btn-reject {
-            background-color: #e67e22;
-            color: white;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 80px 20px;
-            color: #95a5a6;
-        }
-
-        .empty-state i {
-            font-size: 70px;
-            margin-bottom: 20px;
-            color: #bdc3c7;
-        }
-
-        .empty-state p {
-            font-size: 16px;
-            color: #7f8c8d;
-        }
-
-        .modal-content {
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-        }
-
-        .modal-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 12px 12px 0 0;
-            padding: 25px;
-        }
-
-        .modal-header .btn-close {
-            filter: invert(1);
-        }
-
-        .modal-body {
-            padding: 25px;
-        }
-
-        .alert {
-            border: none;
-            border-radius: 8px;
-            padding: 15px 20px;
-            margin-bottom: 20px;
-        }
-
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-        }
-
-        .alert-danger {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-
-        .alert-info {
-            background-color: #d1ecf1;
-            color: #0c5460;
-        }
-
-        .role-badge {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-                min-height: auto;
-            }
-
-            .main-content {
-                margin-left: 0;
-                padding: 20px 15px;
-            }
-
-            .topbar {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .stat-card {
-                margin-bottom: 15px;
-            }
-
-            .table-container {
-                overflow-x: auto;
-            }
-
-            .table {
-                font-size: 14px;
-            }
-        }
-    </style>
+    
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 </head>
-
 <body>
 
-<div class="d-flex">
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="logo">
-            <h3><i class="bi bi-calendar-check"></i> LMS</h3>
-        </div>
-
-        <ul class="nav flex-column p-3">
-            <!-- Dashboard -->
-            <li class="nav-item">
-                <a class="nav-link nav-item-link active" data-section="dashboard" href="#">
-                    <i class="bi bi-speedometer2"></i> Dashboard
-                </a>
-            </li>
-
-            <!-- Employee Menu -->
-            <li class="nav-item employee-menu" style="display: none; padding: 10px 15px; color: rgba(255,255,255,0.5);">
-                <small>EMPLOYEE</small>
-            </li>
-            <li class="nav-item employee-menu" style="display: none;">
-                <a class="nav-link nav-item-link" data-section="apply-leave" href="#">
-                    <i class="bi bi-file-earmark-plus"></i> Apply Leave
-                </a>
-            </li>
-            <li class="nav-item employee-menu" style="display: none;">
-                <a class="nav-link nav-item-link" data-section="my-leaves" href="#">
-                    <i class="bi bi-file-earmark-list"></i> My Leaves
-                </a>
-            </li>
-            <li class="nav-item employee-menu" style="display: none;">
-                <a class="nav-link nav-item-link" data-section="leave-balance" href="#">
-                    <i class="bi bi-pie-chart"></i> Leave Balance
-                </a>
-            </li>
-
-            <!-- Manager Menu -->
-            <li class="nav-item manager-menu" style="display: none; padding: 10px 15px; color: rgba(255,255,255,0.5); margin-top: 15px;">
-                <small>MANAGER</small>
-            </li>
-            <li class="nav-item manager-menu" style="display: none;">
-                <a class="nav-link nav-item-link" data-section="pending-leaves" href="#">
-                    <i class="bi bi-hourglass-split"></i> Pending Leaves
-                </a>
-            </li>
-            <li class="nav-item manager-menu" style="display: none;">
-                <a class="nav-link nav-item-link" data-section="leave-history" href="#">
-                    <i class="bi bi-clock-history"></i> Leave History
-                </a>
-            </li>
-
-            <!-- Common -->
-            <li style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;"></li>
-            <li class="nav-item">
-                <a class="nav-link nav-item-link" data-section="profile" href="#">
-                    <i class="bi bi-person-circle"></i> Profile
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link nav-item-link text-danger" onclick="logout(); return false;" href="#">
-                    <i class="bi bi-box-arrow-right"></i> Logout
-                </a>
-            </li>
-        </ul>
-    </div>
-
-    <!-- Main Content -->
-    <div class="main-content flex-grow-1">
-        <!-- Topbar -->
-        <div class="topbar">
-            <div>
-                <h4 id="page-title">Dashboard</h4>
-            </div>
-
-            <div class="user-info">
-                <div class="avatar" id="user-avatar">P</div>
-                <div>
-                    <small class="role-badge" id="user-role">Employee</small>
-                </div>
-                <button class="btn btn-outline-danger btn-sm" onclick="logout()">
-                    <i class="bi bi-box-arrow-right"></i> Logout
-                </button>
-            </div>
-        </div>
-
-        <!-- Alert Container -->
-        <div id="alert-container"></div>
-
-        <!-- DASHBOARD SECTION -->
-        <div id="dashboard" class="content-section active">
-            <!-- Stats Cards -->
-            <div class="row g-4 mb-4">
-                <div class="col-md-3 col-sm-6">
-                    <div class="stat-card primary">
-                        <h6><i class="bi bi-calendar"></i> Total Leaves</h6>
-                        <h3 id="total-leaves-card">0</h3>
-                    </div>
-                </div>
-
-                <div class="col-md-3 col-sm-6">
-                    <div class="stat-card warning">
-                        <h6><i class="bi bi-check-circle"></i> Used Leaves</h6>
-                        <h3 id="used-leaves-card">0</h3>
-                    </div>
-                </div>
-
-                <div class="col-md-3 col-sm-6">
-                    <div class="stat-card success">
-                        <h6><i class="bi bi-dash-circle"></i> Remaining</h6>
-                        <h3 id="remaining-leaves-card">0</h3>
-                    </div>
-                </div>
-
-                <div class="col-md-3 col-sm-6">
-                    <div class="stat-card danger manager-only" style="display: none;">
-                        <h6><i class="bi bi-hourglass-split"></i> Pending</h6>
-                        <h3 id="pending-leaves-card">0</h3>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Recent Leaves Table -->
-            <div class="table-container">
-                <div style="padding: 20px;">
-                    <h5><i class="bi bi-clock-history"></i> Recent Leave Requests</h5>
-                </div>
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Type</th>
-                            <th>From</th>
-                            <th>To</th>
-                            <th>Days</th>
-                            <th>Status</th>
-                            <th>Applied On</th>
-                        </tr>
-                    </thead>
-                    <tbody id="recent-leaves-tbody">
-                        <tr>
-                            <td colspan="6" class="text-center text-muted py-4">
-                                <i class="bi bi-inbox" style="font-size: 30px; opacity: 0.5;"></i>
-                                <p>No leave requests yet</p>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- APPLY LEAVE SECTION -->
-        <div id="apply-leave" class="content-section employee-content">
-            <div class="form-card">
-                <h5><i class="bi bi-file-earmark-plus"></i> Apply For Leave</h5>
-
-                <form id="apply-leave-form" onsubmit="applyLeave(event)">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label" for="leave-type">Leave Type <span class="text-danger">*</span></label>
-                            <select class="form-select" id="leave-type" required>
-                                <option value="">Select Leave Type</option>
-                            </select>
-                        </div>
-
-                        <div class="col-md-3">
-                            <label class="form-label" for="start-date">From Date <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control" id="start-date" required>
-                        </div>
-
-                        <div class="col-md-3">
-                            <label class="form-label" for="end-date">To Date <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control" id="end-date" required>
-                        </div>
-
-                        <div class="col-12">
-                            <label class="form-label" for="reason">Reason <span class="text-danger">*</span></label>
-                            <textarea class="form-control" id="reason" rows="4" placeholder="Please provide a reason for your leave request..." required></textarea>
-                        </div>
-
-                        <div class="col-12">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-check-circle"></i> Submit Leave Request
-                            </button>
-                            <button type="reset" class="btn btn-outline-secondary ms-2">
-                                <i class="bi bi-arrow-clockwise"></i> Reset
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- MY LEAVES SECTION -->
-        <div id="my-leaves" class="content-section employee-content">
-            <div class="table-container">
-                <div style="padding: 20px;">
-                    <h5><i class="bi bi-file-earmark-list"></i> My Leave Requests</h5>
-                </div>
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Type</th>
-                                <th>From</th>
-                                <th>To</th>
-                                <th>Days</th>
-                                <th>Status</th>
-                                <th>Reason</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="my-leaves-tbody">
-                            <tr>
-                                <td colspan="7" class="text-center text-muted py-4">
-                                    <i class="bi bi-inbox" style="font-size: 30px; opacity: 0.5;"></i>
-                                    <p>No leave requests found</p>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- LEAVE BALANCE SECTION -->
-        <div id="leave-balance" class="content-section employee-content">
-            <div class="table-container">
-                <div style="padding: 20px;">
-                    <h5><i class="bi bi-pie-chart"></i> Leave Balance</h5>
-                </div>
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Leave Type</th>
-                                <th>Total Leaves</th>
-                                <th>Used Leaves</th>
-                                <th>Remaining Leaves</th>
-                                <th>Percentage</th>
-                            </tr>
-                        </thead>
-                        <tbody id="leave-balance-tbody">
-                            <tr>
-                                <td colspan="5" class="text-center text-muted py-4">
-                                    <i class="bi bi-inbox" style="font-size: 30px; opacity: 0.5;"></i>
-                                    <p>No leave balance data</p>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- PENDING LEAVES SECTION (MANAGER) -->
-        <div id="pending-leaves" class="content-section manager-content">
-            <div class="table-container">
-                <div style="padding: 20px;">
-                    <h5><i class="bi bi-hourglass-split"></i> Pending Leave Requests</h5>
-                </div>
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Employee</th>
-                                <th>Leave Type</th>
-                                <th>From</th>
-                                <th>To</th>
-                                <th>Days</th>
-                                <th>Reason</th>
-                                <th>Applied On</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="pending-leaves-tbody">
-                            <tr>
-                                <td colspan="8" class="text-center text-muted py-4">
-                                    <i class="bi bi-inbox" style="font-size: 30px; opacity: 0.5;"></i>
-                                    <p>No pending leave requests</p>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- LEAVE HISTORY SECTION (MANAGER) -->
-        <div id="leave-history" class="content-section manager-content">
-            <div class="table-container">
-                <div style="padding: 20px;">
-                    <h5><i class="bi bi-clock-history"></i> Leave History</h5>
-                </div>
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Employee</th>
-                                <th>Leave Type</th>
-                                <th>From</th>
-                                <th>To</th>
-                                <th>Days</th>
-                                <th>Status</th>
-                                <th>Approved By</th>
-                                <th>Applied On</th>
-                            </tr>
-                        </thead>
-                        <tbody id="leave-history-tbody">
-                            <tr>
-                                <td colspan="8" class="text-center text-muted py-4">
-                                    <i class="bi bi-inbox" style="font-size: 30px; opacity: 0.5;"></i>
-                                    <p>No leave history</p>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- PROFILE SECTION -->
-        <div id="profile" class="content-section">
-            <div class="form-card">
-                <h5><i class="bi bi-person-circle"></i> User Profile</h5>
-
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label">Username</label>
-                        <input class="form-control" id="profile-username" disabled>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Email</label>
-                        <input class="form-control" id="profile-email" disabled>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">First Name</label>
-                        <input class="form-control" id="profile-first-name" disabled>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Last Name</label>
-                        <input class="form-control" id="profile-last-name" disabled>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Role</label>
-                        <input class="form-control" id="profile-role" disabled>
-                    </div>
-                </div>
-            </div>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+            <i class="bi bi-calendar-check"></i> LMS
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+            aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link nav-item-link active" data-section="dashboard" href="#">Dashboard</a>
+                </li>
+                <li class="nav-item employee-menu" style="display: none;">
+                    <a class="nav-link nav-item-link" data-section="apply-leave" href="#">Apply Leave</a>
+                </li>
+                <li class="nav-item employee-menu" style="display: none;">
+                    <a class="nav-link nav-item-link" data-section="my-leaves" href="#">My Leaves</a>
+                </li>
+                <li class="nav-item employee-menu" style="display: none;">
+                    <a class="nav-link nav-item-link" data-section="leave-balance" href="#">Leave Balance</a>
+                </li>
+                <li class="nav-item manager-menu" style="display: none;">
+                    <a class="nav-link nav-item-link" data-section="pending-leaves" href="#">Pending Leaves</a>
+                </li>
+                <li class="nav-item manager-menu" style="display: none;">
+                    <a class="nav-link nav-item-link" data-section="leave-history" href="#">Leave History</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link nav-item-link" data-section="profile" href="#">Profile</a>
+                </li>
+            </ul>
+            <button class="btn btn-outline-danger btn-sm" onclick="logout()">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </button>
         </div>
     </div>
+</nav>
+
+<div class="container mt-4">
+    <div id="alert-container"></div>
+
+    <section id="dashboard" class="content-section active">
+        <h2>Dashboard</h2>
+        <div class="row mb-3">
+            <div class="col-6 col-md-3 mb-2">
+                <div class="p-3 border rounded text-center">
+                    <div>Total Leaves</div>
+                    <div id="total-leaves-card" class="fs-3">0</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3 mb-2">
+                <div class="p-3 border rounded text-center">
+                    <div>Used Leaves</div>
+                    <div id="used-leaves-card" class="fs-3">0</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3 mb-2">
+                <div class="p-3 border rounded text-center">
+                    <div>Remaining</div>
+                    <div id="remaining-leaves-card" class="fs-3">0</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3 mb-2 manager-only" style="display:none;">
+                <div class="p-3 border rounded text-center">
+                    <div>Pending</div>
+                    <div id="pending-leaves-card" class="fs-3">0</div>
+                </div>
+            </div>
+        </div>
+
+        <h5>Recent Leave Requests</h5>
+        <table class="table table-bordered table-sm">
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Days</th>
+                    <th>Status</th>
+                    <th>Applied On</th>
+                </tr>
+            </thead>
+            <tbody id="recent-leaves-tbody">
+                <tr>
+                    <td colspan="6" class="text-center text-muted">No leave requests yet</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section id="apply-leave" class="content-section employee-content" style="display:none;">
+        <h2>Apply Leave</h2>
+        <form id="apply-leave-form" onsubmit="applyLeave(event)">
+            <div class="mb-3">
+                <label for="leave-type" class="form-label">Leave Type</label>
+                <select id="leave-type" class="form-select" required>
+                    <option value="">Select Leave Type</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="start-date" class="form-label">From Date</label>
+                <input id="start-date" type="date" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="end-date" class="form-label">To Date</label>
+                <input id="end-date" type="date" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="reason" class="form-label">Reason</label>
+                <textarea id="reason" class="form-control" rows="3" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </section>
+
+    <section id="my-leaves" class="content-section employee-content" style="display:none;">
+        <h2>My Leaves</h2>
+        <table class="table table-bordered table-sm">
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Days</th>
+                    <th>Status</th>
+                    <th>Reason</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="my-leaves-tbody">
+                <tr>
+                    <td colspan="7" class="text-center text-muted">No leave requests found</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section id="leave-balance" class="content-section employee-content" style="display:none;">
+        <h2>Leave Balance</h2>
+        <table class="table table-bordered table-sm">
+            <thead>
+                <tr>
+                    <th>Leave Type</th>
+                    <th>Total</th>
+                    <th>Used</th>
+                    <th>Remaining</th>
+                </tr>
+            </thead>
+            <tbody id="leave-balance-tbody">
+                <tr>
+                    <td colspan="4" class="text-center text-muted">No leave balance data</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section id="pending-leaves" class="content-section manager-content" style="display:none;">
+        <h2>Pending Leaves</h2>
+        <table class="table table-bordered table-sm">
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Type</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Days</th>
+                    <th>Reason</th>
+                    <th>Applied On</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="pending-leaves-tbody">
+                <tr>
+                    <td colspan="8" class="text-center text-muted">No pending leave requests</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section id="leave-history" class="content-section manager-content" style="display:none;">
+        <h2>Leave History</h2>
+        <table class="table table-bordered table-sm">
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Type</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Days</th>
+                    <th>Status</th>
+                    <th>Approved By</th>
+                    <th>Applied On</th>
+                </tr>
+            </thead>
+            <tbody id="leave-history-tbody">
+                <tr>
+                    <td colspan="8" class="text-center text-muted">No leave history</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section id="profile" class="content-section" style="display:none;">
+        <h2>Profile</h2>
+        <div class="mb-3">
+            <label class="form-label">Username</label>
+            <input id="profile-username" class="form-control" disabled>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input id="profile-email" class="form-control" disabled>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">First Name</label>
+            <input id="profile-first-name" class="form-control" disabled>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Last Name</label>
+            <input id="profile-last-name" class="form-control" disabled>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Role</label>
+            <input id="profile-role" class="form-control" disabled>
+        </div>
+    </section>
 </div>
 
 <!-- Edit Leave Modal -->
@@ -841,830 +296,15 @@
                 </div>
                 <input type="hidden" id="action-leave-id">
             </div>
-        </div>
-    </div>
-</div>
 
-<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-    // API Base URL
-    const API_BASE = '/leave';
-    const USER_API = '/user';
-    let currentUser = {};
-    let editLeaveModal = new bootstrap.Modal(document.getElementById('editLeaveModal'));
-    let approveRejectModal = new bootstrap.Modal(document.getElementById('approveRejectModal'));
-
-    // Initialize
-    document.addEventListener('DOMContentLoaded', initializeDashboard);
-
-    function initializeDashboard() {
-        // Check if token exists
-        const token = localStorage.getItem('access_token');
-        if (!token) {
-            window.location.href = '/login/';
-            return;
-        }
-        
-        getCurrentUser();
-        loadLeaveTypes();
-        setupEventListeners();
-    }
-
-    // Setup Event Listeners
-    function setupEventListeners() {
-        document.querySelectorAll('.nav-item-link').forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                switchSection(link.dataset.section);
-            });
-        });
-    }
-
-    // Get Current User
-    async function getCurrentUser() {
-        try {
-            const token = localStorage.getItem('access_token');
-            console.log('Token exists:', !!token);
-            console.log('Token value:', token ? token.substring(0, 20) + '...' : 'null');
-            
-            const response = await fetch('/user/profile/', {
-                method: 'GET',
-                headers: { 
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-            
-            console.log('Profile response status:', response.status);
-            
-            if (response.status === 401) {
-                console.log('Unauthorized - clearing tokens and redirecting to login');
-                localStorage.removeItem('access_token');
-                localStorage.removeItem('refresh_token');
-                window.location.href = '/login/';
-                return;
-            }
-            
-            if (response.status === 403) {
-                console.log('Forbidden access');
-                showAlert('Access denied. Please contact administrator.', 'danger');
-                return;
-            }
-            
-            if (response.ok) {
-                const userData = await response.json();
-                console.log('User data loaded:', userData);
-                currentUser = userData;
-                updateUserDisplay();
-                loadDashboardData();
-                toggleMenus();
-            } else {
-                const errorData = await response.text();
-                console.log('Error response body:', errorData);
-                console.log('Error response:', response.status);
-                showAlert('Error loading user profile: ' + response.status, 'danger');
-            }
-        } catch (error) {
-            console.error('Error fetching user:', error);
-            console.error('Error details:', error.message);
-            showAlert('Connection error: ' + error.message + '. Please refresh the page.', 'danger');
-        }
-    }
-
-    function updateUserDisplay() {
-        try {
-            if (!currentUser) {
-                console.error('Current user is null');
-                return;
-            }
-            
-            const firstName = currentUser.firstName || currentUser.first_name || currentUser.username || 'User';
-            const lastName = currentUser.lastName || currentUser.last_name || '';
-            const avatar = firstName.charAt(0).toUpperCase();
-            
-            const userNameElement = document.getElementById('user-name');
-            const userAvatarElement = document.getElementById('user-avatar');
-            const userRoleElement = document.getElementById('user-role');
-            
-            if (userNameElement) userNameElement.textContent = firstName;
-            if (userAvatarElement) userAvatarElement.textContent = avatar;
-            if (userRoleElement) userRoleElement.textContent = currentUser.role || 'Employee';
-            
-            // Profile section
-            const profileUsername = document.getElementById('profile-username');
-            const profileEmail = document.getElementById('profile-email');
-            const profileFirstName = document.getElementById('profile-first-name');
-            const profileLastName = document.getElementById('profile-last-name');
-            const profileRole = document.getElementById('profile-role');
-            
-            if (profileUsername) profileUsername.value = currentUser.username || '';
-            if (profileEmail) profileEmail.value = currentUser.email || '';
-            if (profileFirstName) profileFirstName.value = firstName || '';
-            if (profileLastName) profileLastName.value = lastName || '';
-            if (profileRole) profileRole.value = currentUser.role || '';
-            
-            console.log('User display updated successfully');
-        } catch (error) {
-            console.error('Error updating user display:', error);
-        }
-    }
-
-    function toggleMenus() {
-        const isEmployee = currentUser.role === 'employee';
-        const isManager = currentUser.role === 'manager';
-        
-        document.querySelectorAll('.employee-menu').forEach(el => {
-            el.style.display = isEmployee ? '' : 'none';
-        });
-        
-        document.querySelectorAll('.manager-menu').forEach(el => {
-            el.style.display = isManager ? '' : 'none';
-        });
-
-        document.querySelectorAll('.employee-content').forEach(el => {
-            el.style.display = isEmployee ? 'block' : 'none';
-        });
-
-        document.querySelectorAll('.manager-only').forEach(el => {
-            el.style.display = isManager ? 'block' : 'none';
-        });
-
-        // Manager content sections: remove inline display override so CSS .content-section controls visibility
-        document.querySelectorAll('.manager-content').forEach(el => {
-            if (isManager) {
-                el.style.removeProperty('display');
-            }
-        });
-    }
-
-    // Load Leave Types
-    async function loadLeaveTypes() {
-        try {
-            const response = await fetch(`${API_BASE}/leave-types/`, {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
-            });
-            
-            if (response.ok) {
-                const types = await response.json();
-                console.log('Leave types loaded:', types);
-                const select = document.getElementById('leave-type');
-                select.innerHTML = '<option value="">Select Leave Type</option>';
-                
-                // Handle both array and paginated responses
-                const typeList = Array.isArray(types) ? types : (types.results || []);
-                typeList.forEach(type => {
-                    const option = document.createElement('option');
-                    option.value = type.id;
-                    option.textContent = type.name;
-                    select.appendChild(option);
-                });
-            }
-        } catch (error) {
-            console.error('Error loading leave types:', error);
-        }
-    }
-
-    // Load Dashboard Data
-    async function loadDashboardData() {
-        if (currentUser.role === 'employee') {
-            loadEmployeeDashboard();
-        } else if (currentUser.role === 'manager') {
-            loadManagerDashboard();
-        }
-    }
-
-    async function loadEmployeeDashboard() {
-        console.log('=== LOADING EMPLOYEE DASHBOARD ===');
-        
-        // Load leave balance
-        try {
-            const response = await fetch(`${API_BASE}/leave-balance/`, {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
-            });
-            
-            console.log('Leave balance response status:', response.status);
-            
-            if (response.ok) {
-                const balances = await response.json();
-                console.log('Leave balances:', balances);
-                
-                let totalLeaves = 0, usedLeaves = 0;
-                
-                // Handle both array and paginated responses
-                const balanceList = Array.isArray(balances) ? balances : (balances.results || []);
-                balanceList.forEach(balance => {
-                    totalLeaves += balance.totalLeaves || 0;
-                    usedLeaves += balance.usedLeaves || 0;
-                });
-                
-                const remainingLeaves = totalLeaves - usedLeaves;
-                
-                const totalElement = document.getElementById('total-leaves-card');
-                const usedElement = document.getElementById('used-leaves-card');
-                const remainingElement = document.getElementById('remaining-leaves-card');
-                
-                if (totalElement) totalElement.textContent = totalLeaves;
-                if (usedElement) usedElement.textContent = usedLeaves;
-                if (remainingElement) remainingElement.textContent = remainingLeaves;
-            } else {
-                console.log('Error loading leave balance:', response.status);
-            }
-        } catch (error) {
-            console.error('Error in loadEmployeeDashboard:', error);
-        }
-        
-        // Load recent leaves
-        console.log('Calling loadMyLeaves...');
-        loadMyLeaves('recent');
-    }
-
-    async function loadManagerDashboard() {
-        loadPendingLeaves();
-        loadLeaveHistory();
-    }
-
-    // Load My Leaves
-    async function loadMyLeaves(type = 'all') {
-        try {
-            const url = `${API_BASE}/my-leaves/`;
-            console.log('=== LOADING MY LEAVES ===');
-            console.log('URL:', url);
-            console.log('Type:', type);
-            
-            const response = await fetch(url, {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
-            });
-            
-            console.log('Response status:', response.status);
-            
-            if (response.ok) {
-                const leaves = await response.json();
-                console.log('RAW leaves data from API:', leaves);
-                console.log('Number of leaves:', leaves.length);
-                
-                if (leaves.length > 0) {
-                    console.log('First leave object:', JSON.stringify(leaves[0], null, 2));
-                }
-                
-                const tbody = type === 'recent' ? 
-                    document.getElementById('recent-leaves-tbody') : 
-                    document.getElementById('my-leaves-tbody');
-                
-                tbody.innerHTML = '';
-                
-                if (!leaves || leaves.length === 0) {
-                    console.log('No leaves found, showing empty state');
-                    tbody.innerHTML = `
-                        <tr>
-                            <td colspan="7" class="text-center text-muted py-4">
-                                <i class="bi bi-inbox" style="font-size: 30px; opacity: 0.5;"></i>
-                                <p>No leave requests found</p>
-                            </td>
-                        </tr>
-                    `;
-                    return;
-                }
-                
-                const displayLeaves = type === 'recent' ? leaves.slice(0, 5) : leaves;
-                console.log('Displaying', displayLeaves.length, 'leaves');
-                
-                displayLeaves.forEach(leave => {
-                    console.log('Processing leave:', leave);
-                    
-                    // Get dates and leave type using camelCase keys (from DRF camel-case renderer)
-                    const startDateStr = leave.startDate || 'N/A';
-                    const endDateStr = leave.endDate || 'N/A';
-                    const leaveTypeName = leave.leaveTypeName || 'Unknown';
-                    
-                    // Calculate days
-                    let days = 'N/A';
-                    if (leave.startDate && leave.endDate) {
-                        try {
-                            const [startY, startM, startD] = leave.startDate.split('-').map(Number);
-                            const [endY, endM, endD] = leave.endDate.split('-').map(Number);
-                            const start = new Date(startY, startM - 1, startD);
-                            const end = new Date(endY, endM - 1, endD);
-                            days = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
-                        } catch (e) {
-                            console.warn('Error calculating days:', e);
-                            days = 'N/A';
-                        }
-                    }
-                    
-                    const appliedDate = leave.appliedAt ? new Date(leave.appliedAt).toLocaleDateString() : 'N/A';
-                    const statusBadge = `<span class="badge ${leave.status}">${leave.status}</span>`;
-                    
-                    let actions = '';
-                    if (leave.status === 'pending') {
-                        actions = `
-                            <button class="action-btn action-btn-edit" onclick="openEditModal(${leave.id}, '${leave.startDate}', '${leave.endDate}', '${(leave.reason || '').replace(/'/g, "\\'")}')"> 
-                                <i class="bi bi-pencil"></i> Edit
-                            </button>
-                            <button class="action-btn action-btn-delete" onclick="deleteLeave(${leave.id})">
-                                <i class="bi bi-trash"></i> Delete
-                            </button>
-                        `;
-                    }
-                    
-                    const cols = type === 'recent' ? 6 : 7;
-                    const reasonCol = type === 'recent' ? '' : `<td>${(leave.reason || '').substring(0, 30)}...</td>`;
-                    const extraCol = type === 'recent' ? `<td>${appliedDate}</td>` : `<td>${actions}</td>`;
-                    
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>${leaveTypeName}</td>
-                            <td>${startDateStr}</td>
-                            <td>${endDateStr}</td>
-                            <td>${days}</td>
-                            <td>${statusBadge}</td>
-                            ${reasonCol}
-                            ${extraCol}
-                        </tr>
-                    `;
-                });
-            } else {
-                console.log('Error response:', response.status);
-                showAlert('Error loading leaves', 'danger');
-            }
-        } catch (error) {
-            showAlert('Error loading leaves: ' + error.message, 'danger');
-            console.error('Error loading leaves:', error);
-        }
-    }
-
-    // Load Leave Balance
-    async function loadLeaveBalance() {
-        try {
-            const response = await fetch(`${API_BASE}/leave-balance/`, {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
-            });
-            
-            console.log('Leave balance response status:', response.status);
-            
-            if (response.ok) {
-                const balances = await response.json();
-                console.log('Leave balances:', balances);
-                
-                const tbody = document.getElementById('leave-balance-tbody');
-                tbody.innerHTML = '';
-                
-                if (!balances || balances.length === 0) {
-                    tbody.innerHTML = `
-                        <tr>
-                            <td colspan="5" class="text-center text-muted py-4">No leave balance data</td>
-                        </tr>
-                    `;
-                    return;
-                }
-                
-                // Handle both array and paginated responses
-                const balList = Array.isArray(balances) ? balances : (balances.results || []);
-                balList.forEach(balance => {
-                    const percentage = balance.totalLeaves > 0 ? (balance.usedLeaves / balance.totalLeaves * 100).toFixed(1) : 0;
-                    tbody.innerHTML += `
-                        <tr>
-                            <td><strong>${balance.leaveTypeName}</strong></td>
-                            <td>${balance.totalLeaves}</td>
-                            <td>${balance.usedLeaves}</td>
-                            <td>${balance.remainingLeaves}</td>
-                            <td>
-                                <div class="progress" style="height: 20px;">
-                                    <div class="progress-bar" role="progressbar" style="width: ${percentage}%" aria-valuenow="${percentage}" aria-valuemin="0" aria-valuemax="100">${percentage}%</div>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
-                });
-            } else {
-                console.log('Error loading leave balance:', response.status);
-                const tbody = document.getElementById('leave-balance-tbody');
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="5" class="text-center text-danger">Error loading leave balance</td>
-                    </tr>
-                `;
-            }
-        } catch (error) {
-            console.error('Error loading leave balance:', error);
-            const tbody = document.getElementById('leave-balance-tbody');
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="5" class="text-center text-danger">Error: ${error.message}</td>
-                </tr>
-            `;
-        }
-    }
-
-    // Load Pending Leaves (Manager)
-    async function loadPendingLeaves() {
-        try {
-            const response = await fetch(`${API_BASE}/pending-leaves/`, {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
-            });
-            
-            console.log('Pending leaves response status:', response.status);
-            
-            if (response.ok) {
-                const leaves = await response.json();
-                console.log('Pending leaves:', leaves);
-                
-                const tbody = document.getElementById('pending-leaves-tbody');
-                tbody.innerHTML = '';
-                
-                // Update pending count
-                document.getElementById('pending-leaves-card').textContent = leaves.length;
-                
-                if (!leaves || leaves.length === 0) {
-                    tbody.innerHTML = `
-                        <tr>
-                            <td colspan="8" class="text-center text-muted py-4">
-                                <i class="bi bi-inbox" style="font-size: 30px; opacity: 0.5;"></i>
-                                <p>No pending leave requests</p>
-                            </td>
-                        </tr>
-                    `;
-                    return;
-                }
-                
-                leaves.forEach(leave => {
-                    const startDate = new Date(leave.startDate).toLocaleDateString();
-                    const endDate = new Date(leave.endDate).toLocaleDateString();
-                    const appliedDate = new Date(leave.appliedAt).toLocaleDateString();
-                    const days = Math.ceil((new Date(leave.endDate) - new Date(leave.startDate)) / (1000 * 60 * 60 * 24)) + 1;
-                    const reason = leave.reason ? leave.reason.substring(0, 30) : '';
-                    
-                    tbody.innerHTML += `
-                        <tr>
-                            <td><strong>${leave.employeeName}</strong></td>
-                            <td>${leave.leaveTypeName || leave.leaveType}</td>
-                            <td>${startDate}</td>
-                            <td>${endDate}</td>
-                            <td>${days}</td>
-                            <td>${reason}...</td>
-                            <td>${appliedDate}</td>
-                            <td>
-                                <button class="action-btn action-btn-approve" onclick="openApproveRejectModal(${leave.id}, '${leave.employeeName.replace(/'/g, "\\'")}', '${(leave.leaveTypeName || '').replace(/'/g, "\\'")}', '${startDate}', '${endDate}')">
-                                    <i class="bi bi-check-circle"></i> Action
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                });
-            }
-        } catch (error) {
-            console.error('Error loading pending leaves:', error);
-        }
-    }
-
-    // Load Leave History (Manager)
-    async function loadLeaveHistory() {
-        try {
-            const response = await fetch(`${API_BASE}/all-leave-request`, {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
-            });
-            
-            console.log('Leave history response status:', response.status);
-            
-            if (response.ok) {
-                const leaves = await response.json();
-                console.log('Leave history:', leaves);
-                
-                const tbody = document.getElementById('leave-history-tbody');
-                tbody.innerHTML = '';
-                
-                if (!leaves || leaves.length === 0) {
-                    tbody.innerHTML = `
-                        <tr>
-                            <td colspan="8" class="text-center text-muted py-4">No leave history</td>
-                        </tr>
-                    `;
-                    return;
-                }
-                
-                leaves.forEach(leave => {
-                    const startDate = new Date(leave.startDate).toLocaleDateString();
-                    const endDate = new Date(leave.endDate).toLocaleDateString();
-                    const appliedDate = new Date(leave.appliedAt).toLocaleDateString();
-                    const days = Math.ceil((new Date(leave.endDate) - new Date(leave.startDate)) / (1000 * 60 * 60 * 24)) + 1;
-                    const statusBadge = `<span class="badge ${leave.status}">${leave.status}</span>`;
-                    
-                    tbody.innerHTML += `
-                        <tr>
-                            <td><strong>${leave.employeeName}</strong></td>
-                            <td>${leave.leaveTypeName || leave.leaveType}</td>
-                            <td>${startDate}</td>
-                            <td>${endDate}</td>
-                            <td>${days}</td>
-                            <td>${statusBadge}</td>
-                            <td>${leave.approvedBy || '-'}</td>
-                            <td>${appliedDate}</td>
-                        </tr>
-                    `;
-                });
-            } else {
-                console.log('Error loading leave history:', response.status);
-            }
-        } catch (error) {
-            console.error('Error loading leave history:', error);
-        }
-    }
-
-    // Apply Leave
-    async function applyLeave(e) {
-        e.preventDefault();
-        
-        const leaveType = document.getElementById('leave-type').value;
-        const startDate = document.getElementById('start-date').value;
-        const endDate = document.getElementById('end-date').value;
-        const reason = document.getElementById('reason').value;
-        
-        if (!leaveType || !startDate || !endDate || !reason) {
-            showAlert('Please fill all fields', 'danger');
-            return;
-        }
-        
-        // Validate dates
-        if (new Date(startDate) > new Date(endDate)) {
-            showAlert('Start date must be before end date', 'danger');
-            return;
-        }
-        
-        try {
-            const payload = {
-                leaveType: parseInt(leaveType),
-                startDate: startDate,
-                endDate: endDate,
-                reason: reason
-            };
-            
-            console.log('Submitting leave request with payload:', payload);
-            
-            const response = await fetch(`${API_BASE}/leave-request-create/`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            });
-            
-            console.log('Leave request response status:', response.status);
-            const responseData = await response.json();
-            console.log('FULL Leave request response:', JSON.stringify(responseData, null, 2));
-            console.log('Leave startDate:', responseData.startDate);
-            console.log('Leave endDate:', responseData.endDate);
-            console.log('Leave leaveType:', responseData.leaveType);
-            console.log('Leave leaveTypeName:', responseData.leaveTypeName);
-            
-            if (response.status === 201) {
-                showAlert('Leave request submitted successfully!', 'success');
-                document.getElementById('apply-leave-form').reset();
-                document.getElementById('leave-type').innerHTML = '<option value="">Select Leave Type</option>';
-                loadLeaveTypes();
-                setTimeout(() => {
-                    loadMyLeaves();
-                    switchSection('my-leaves');
-                }, 1000);
-            } else {
-                showAlert(responseData.detail || JSON.stringify(responseData) || 'Error submitting leave request', 'danger');
-            }
-        } catch (error) {
-            showAlert('Error submitting leave request: ' + error.message, 'danger');
-            console.error('Error:', error);
-        }
-    }
-
-    // Open Edit Modal
-    function openEditModal(leaveId, startDate, endDate, reason) {
-        document.getElementById('edit-leave-id').value = leaveId;
-        document.getElementById('edit-start-date').value = startDate;
-        document.getElementById('edit-end-date').value = endDate;
-        document.getElementById('edit-reason').value = reason;
-        editLeaveModal.show();
-    }
-
-    // Update Leave
-    async function updateLeave(e) {
-        e.preventDefault();
-        
-        const leaveId = document.getElementById('edit-leave-id').value;
-        const startDate = document.getElementById('edit-start-date').value;
-        const endDate = document.getElementById('edit-end-date').value;
-        const reason = document.getElementById('edit-reason').value;
-        
-        console.log('Updating leave:', { leaveId, startDate, endDate, reason });
-        
-        try {
-            const response = await fetch(`${API_BASE}/my-leaves/${leaveId}`, {
-                method: 'PATCH',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    startDate: startDate,
-                    endDate: endDate,
-                    reason: reason
-                })
-            });
-            
-            console.log('Update response status:', response.status);
-            
-            if (response.ok) {
-                const result = await response.json();
-                console.log('Update result:', result);
-                showAlert('Leave request updated successfully!', 'success');
-                editLeaveModal.hide();
-                loadMyLeaves();
-            } else {
-                const error = await response.json();
-                console.log('Update error:', error);
-                showAlert(error.detail || 'Error updating leave', 'danger');
-            }
-        } catch (error) {
-            console.error('Error updating leave:', error);
-            showAlert('Error updating leave', 'danger');
-        }
-    }
-
-    // Delete Leave
-    async function deleteLeave(leaveId) {
-        if (!confirm('Are you sure you want to delete this leave request?')) return;
-        
-        console.log('Deleting leave ID:', leaveId);
-        
-        try {
-            const response = await fetch(`${API_BASE}/my-leaves/${leaveId}`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
-            });
-            
-            console.log('Delete response status:', response.status);
-            
-            if (response.ok || response.status === 204) {
-                const result = await response.text();
-                console.log('Delete result:', result);
-                showAlert('Leave request deleted successfully!', 'success');
-                loadMyLeaves();
-            } else {
-                const error = await response.json();
-                console.log('Delete error:', error);
-                showAlert('Error deleting leave request', 'danger');
-            }
-        } catch (error) {
-            console.error('Error deleting leave:', error);
-            showAlert('Error deleting leave', 'danger');
-        }
-    }
-
-    // Open Approve/Reject Modal
-    function openApproveRejectModal(leaveId, employeeName, leaveType, startDate, endDate) {
-        document.getElementById('action-leave-id').value = leaveId;
-        document.getElementById('leave-details').innerHTML = `
-            <div class="alert alert-info">
-                <strong>${employeeName}</strong> requested <strong>${leaveType}</strong> leave<br>
-                From <strong>${startDate}</strong> to <strong>${endDate}</strong>
-            </div>
-        `;
-        approveRejectModal.show();
-    }
-
-    // Approve Leave
-    async function approveLeave() {
-        const leaveId = document.getElementById('action-leave-id').value;
-        console.log('Approving leave ID:', leaveId);
-        
-        try {
-            const response = await fetch(`${API_BASE}/leave-request-approve/${leaveId}`, {
-                method: 'PATCH',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ status: 'approved' })
-            });
-            
-            console.log('Approve response status:', response.status);
-            
-            if (response.ok) {
-                const result = await response.json();
-                console.log('Approve result:', result);
-                showAlert('Leave approved successfully!', 'success');
-                approveRejectModal.hide();
-                loadPendingLeaves();
-                loadLeaveHistory();
-            } else {
-                const error = await response.json();
-                console.log('Approve error response:', error);
-                showAlert('Error approving leave: ' + (error.detail || 'Unknown error'), 'danger');
-            }
-        } catch (error) {
-            console.error('Error approving leave:', error);
-            showAlert('Error approving leave', 'danger');
-        }
-    }
-
-    // Reject Leave
-    async function rejectLeave() {
-        const leaveId = document.getElementById('action-leave-id').value;
-        console.log('Rejecting leave ID:', leaveId);
-        
-        try {
-            const response = await fetch(`${API_BASE}/leave-request-approve/${leaveId}`, {
-                method: 'PATCH',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ status: 'rejected' })
-            });
-            
-            console.log('Reject response status:', response.status);
-            
-            if (response.ok) {
-                const result = await response.json();
-                console.log('Reject result:', result);
-                showAlert('Leave rejected successfully!', 'success');
-                approveRejectModal.hide();
-                loadPendingLeaves();
-                loadLeaveHistory();
-            } else {
-                const error = await response.json();
-                console.log('Reject error response:', error);
-                showAlert('Error rejecting leave: ' + (error.detail || 'Unknown error'), 'danger');
-            }
-        } catch (error) {
-            console.error('Error rejecting leave:', error);
-            showAlert('Error rejecting leave', 'danger');
-        }
-    }
-
-    // Switch Section
-    function switchSection(sectionId) {
-        // Hide all sections
-        document.querySelectorAll('.content-section').forEach(section => {
-            section.classList.remove('active');
-        });
-        
-        // Show selected section
-        document.getElementById(sectionId).classList.add('active');
-        
-        // Update active nav link
-        document.querySelectorAll('.nav-item-link').forEach(link => {
-            link.classList.remove('active');
-        });
-        document.querySelector(`[data-section="${sectionId}"]`).classList.add('active');
-        
-        // Update page title
-        const titles = {
-            'dashboard': 'Dashboard',
-            'apply-leave': 'Apply Leave',
-            'my-leaves': 'My Leaves',
-            'leave-balance': 'Leave Balance',
-            'pending-leaves': 'Pending Leaves',
-            'leave-history': 'Leave History',
-            'profile': 'Profile'
-        };
-        document.getElementById('page-title').textContent = titles[sectionId] || 'Dashboard';
-        
-        // Load data based on section
-        if (sectionId === 'leave-balance') {
-            loadLeaveBalance();
-        } else if (sectionId === 'my-leaves') {
-            loadMyLeaves();
-        } else if (sectionId === 'pending-leaves') {
-            loadPendingLeaves();
-        } else if (sectionId === 'leave-history') {
-            loadLeaveHistory();
-        }
-    }
-
-    // Show Alert
-    function showAlert(message, type = 'info') {
-        const alertHTML = `
-            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-                <i class="bi bi-exclamation-circle"></i> ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        `;
-        
-        const container = document.getElementById('alert-container');
-        container.innerHTML = alertHTML;
-        
-        setTimeout(() => {
-            container.innerHTML = '';
-        }, 5000);
-    }
-
-    // Logout
-    function logout() {
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-        window.location.href = '/login/';
-    }
-</script>
+<script src="{% static 'js/auth.js' %}"></script>
+<script src="{% static 'js/leave-init.js' %}"></script>
+<script src="{% static 'js/leave-dashboard.js' %}"></script>
+<script src="{% static 'js/leave-data.js' %}"></script>
+<script src="{% static 'js/leave-crud.js' %}"></script>
+<script src="{% static 'js/leave-approval.js' %}"></script>
+<script src="{% static 'js/dashboard.js' %}"></script>
 
 </body>
 </html>

@@ -11,12 +11,13 @@ class LeaveRequestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model=LeaveRequest
-        fields=['employee_name','leave_type','leave_type_name','start_date','end_date','reason','applied_at','status','approved_by']
-        read_only_fields=['applied_at','approved_by']
+        fields=['id','employee_name','leave_type','leave_type_name','start_date','end_date','reason','applied_at','status','approved_by']
+        read_only_fields=['id','applied_at','approved_by']
 
     def validate(self, data):
-        if data['start_date'] > data['end_date']:
-            raise serializers.ValidationError('Start date should be greater than end date')
+        if data.get('start_date') and data.get('end_date'):
+            if data['start_date'] > data['end_date']:
+                raise serializers.ValidationError('Start date should be less than end date')
         return data
     
 
@@ -27,7 +28,29 @@ class LeaveRequestCreateSerializer(serializers.ModelSerializer):
     '''
     class Meta:
         model=LeaveRequest
-        fields='__all__'
+        fields=['id','leave_type','start_date','end_date','reason']
+        read_only_fields=['id']
+
+    def to_internal_value(self, data):
+        """Convert camelCase to snake_case and handle field mapping"""
+        data = dict(data)        
+        camel_to_snake = {
+            'leaveType': 'leave_type',
+            'startDate': 'start_date',
+            'endDate': 'end_date',
+        }
+        
+        for camel, snake in camel_to_snake.items():
+            if camel in data:
+                data[snake] = data.pop(camel)
+        
+        return super().to_internal_value(data)
+
+    def validate(self, data):
+        if data.get('start_date') and data.get('end_date'):
+            if data['start_date'] > data['end_date']:
+                raise serializers.ValidationError('Start date should be less than end date')
+        return data
 
 class LeaveRequestUpdateSerializer(serializers.ModelSerializer):
     '''
@@ -35,7 +58,14 @@ class LeaveRequestUpdateSerializer(serializers.ModelSerializer):
     '''
     class Meta:
         model=LeaveRequest
-        fields=['start_date','end_date']
+        fields=['id','start_date','end_date','reason']
+        read_only_fields=['id']
+    
+    def validate(self, data):
+        if data.get('start_date') and data.get('end_date'):
+            if data['start_date'] > data['end_date']:
+                raise serializers.ValidationError('Start date should be less than end date')
+        return data
 
 class LeaveRequestApproveSerializer(serializers.ModelSerializer):
     '''
@@ -48,7 +78,7 @@ class LeaveRequestApproveSerializer(serializers.ModelSerializer):
 class LeaveTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model=LeaveType
-        fields=('name','max_leaves')
+        fields=['id','name','max_leaves']
 
 class LeaveBalanceSerializer(serializers.ModelSerializer):
     user_name=serializers.CharField(source='user.username',read_only=True)
@@ -56,7 +86,7 @@ class LeaveBalanceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model=LeaveBalance
-        fields=('user_name','leave_type_name','total_leaves','used_leaves','remaining_leaves')
+        fields=['user_name','leave_type_name','total_leaves','used_leaves','remaining_leaves']
 
 class LeaveLogSerializer(serializers.ModelSerializer):
     leave_request_name=serializers.CharField(source='leave_request.user.username',read_only=True)

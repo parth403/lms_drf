@@ -24,7 +24,7 @@
             padding: 35px;
             width: 380px;
             border-radius: 15px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 20px rgba(66, 65, 65, 0.2);
             text-align: center;
         }
 
@@ -58,10 +58,6 @@
             border-radius: 8px;
             cursor: pointer;
             transition: 0.3s;
-        }
-
-        .login-container button:hover {
-            background: #00c6ff;
         }
 
         #message {
@@ -108,14 +104,11 @@ document.getElementById("loginForm").addEventListener("submit", async function(e
         });
 
         const result = await response.json();
-        console.log('Login response status:', response.status);
-        console.log('Login response:', result);
         
         const message = document.getElementById("message");
 
         if (response.ok) {
             // Save tokens to localStorage
-            console.log('Saving tokens to localStorage');
             localStorage.setItem('access_token', result.access);
             localStorage.setItem('refresh_token', result.refresh);
             
