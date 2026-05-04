@@ -26,6 +26,3 @@ def login_page(request):
 def user_dashboard_page(request):
     return render(request, 'user_dashboard.html', {})
 
-@require_http_methods(['GET'])
-def root_redirect(request):
-    return redirect('dashboard')

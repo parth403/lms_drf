@@ -10,8 +10,6 @@ async function loadMyLeaves(type = 'all') {
 
         if (response.ok) {
             const leaves = await response.json();
-  
-
             if (leaves.length > 0) {
                 console.log('First leave object:', JSON.stringify(leaves[0], null, 2));
             }
@@ -23,12 +21,11 @@ async function loadMyLeaves(type = 'all') {
             tbody.innerHTML = '';
 
             if (!leaves || leaves.length === 0) {
-                console.log('No leaves found, showing empty state');
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="7" class="text-center text-muted py-4">
                             <i class="bi bi-inbox" style="font-size: 30px; opacity: 0.5;"></i>
-                            <p>No leave requests found</p>
+                            <p>No leaves</p>
                         </td>
                     </tr>
                 `;
@@ -74,7 +71,7 @@ async function loadMyLeaves(type = 'all') {
                 }
 
                 const cols = type === 'recent' ? 6 : 7;
-                const reasonCol = type === 'recent' ? '' : `<td>${(leave.reason || '').substring(0, 30)}...</td>`;
+                const reasonCol = type === 'recent' ? '' : `<td>${(leave.reason || '').substring(0, 30)}</td>`;
                 const extraCol = type === 'recent' ? `<td>${appliedDate}</td>` : `<td>${actions}</td>`;
 
                 tbody.innerHTML += `
@@ -125,7 +122,6 @@ async function loadLeaveBalance() {
             // Handle both array and paginated responses
             const balList = Array.isArray(balances) ? balances : (balances.results || []);
             balList.forEach(balance => {
-                const percentage = balance.totalLeaves > 0 ? (balance.usedLeaves / balance.totalLeaves * 100).toFixed(1) : 0;
                 tbody.innerHTML += `
                     <tr>
                         <td><strong>${balance.leaveTypeName}</strong></td>
@@ -190,6 +186,7 @@ async function loadPendingLeaves() {
                 const appliedDate = new Date(leave.appliedAt).toLocaleDateString();
                 const days = Math.ceil((new Date(leave.endDate) - new Date(leave.startDate)) / (1000 * 60 * 60 * 24)) + 1;
                 const reason = leave.reason ? leave.reason.substring(0, 30) : '';
+                // const approvedBy=leave.approvedBy || '-';
 
                 tbody.innerHTML += `
                     <tr>
@@ -200,7 +197,7 @@ async function loadPendingLeaves() {
                         <td>${days}</td>
                         <td>${reason}...</td>
                         <td>${appliedDate}</td>
-                        <td>
+                            <td>
                             <button class="action-btn action-btn-approve" onclick="openApproveRejectModal(${leave.id}, '${leave.employeeName.replace(/'/g, "\\'")}', '${(leave.leaveTypeName || '').replace(/'/g, "\\'")}', '${startDate}', '${endDate}')">
                                 <i class="bi bi-check-circle"></i> Action
                             </button>

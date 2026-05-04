@@ -1,25 +1,14 @@
-// ============================================
-// Dashboard Loading Functions
-// ============================================
-
 /**
  * Load employee dashboard with leave balance and recent leaves
  */
 async function loadEmployeeDashboard() {
-    console.log('=== LOADING EMPLOYEE DASHBOARD ===');
-
     // Load leave balance
     try {
         const response = await fetch(`${API_BASE}/leave-balance/`, {
             headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
         });
-
-        console.log('Leave balance response status:', response.status);
-
         if (response.ok) {
             const balances = await response.json();
-            console.log('Leave balances:', balances);
-
             let totalLeaves = 0, usedLeaves = 0;
 
             // Handle both array and paginated responses

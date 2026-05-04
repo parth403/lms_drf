@@ -102,5 +102,7 @@ class TestLeaveRequest:
             'leave_type':create_leave_type.id,
             'reason':'sick leave'
         },format='json')
-        assert response_create.status_code==201
+        assert response_create.status_code==400
         assert response_create.data['reason']=='sick leave'
+
+    

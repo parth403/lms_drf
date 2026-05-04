@@ -131,7 +131,7 @@ body {
 .table tbody td {
   padding: 14px 12px;
   border-top: 1px solid #f1f3f7;
-  color: #34495e;
+  color: #000000;
 }
 
 .table tbody tr:hover {
@@ -143,21 +143,24 @@ body {
   padding: 6px 12px;
   font-size: 11px;
   font-weight: 700;
+  color: black;
+  background: transparent;
+  border: none;
 }
 
 .badge.pending {
-  background: #fff4ce;
-  color: #a97600;
+  color: black;
+  background: transparent;
 }
 
 .badge.approved {
-  background: #d4f1de;
-  color: #166f3f;
+  color: black;
+  background: transparent;
 }
 
 .badge.rejected {
-  background: #f6d7d7;
-  color: #7f2e31;
+  color: black;
+  background: transparent;
 }
 
 .action-btn {

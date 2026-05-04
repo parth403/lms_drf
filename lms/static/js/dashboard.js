@@ -39,7 +39,7 @@ function switchSection(sectionId) {
             'leave-history': 'Leave History',
             'profile': 'Profile'
         };
-        pageTitle.textContent = titles[sectionId] || 'Dashboard';
+        pageTitle.textContent = titles[sectionId];
     }
 
     // Load data based on section

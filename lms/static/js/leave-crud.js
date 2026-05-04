@@ -113,11 +113,9 @@ async function updateLeave(e) {
             loadMyLeaves();
         } else {
             const error = await response.json();
-            console.log('Update error:', error);
             showAlert(error.detail || 'Error updating leave', 'danger');
         }
     } catch (error) {
-        console.error('Error updating leave:', error);
         showAlert('Error updating leave', 'danger');
     }
 }
@@ -141,7 +139,6 @@ async function deleteLeave(leaveId) {
             showAlert('Error deleting leave request', 'danger');
         }
     } catch (error) {
-        console.error('Error deleting leave:', error);
         showAlert('Error deleting leave', 'danger');
     }
 }

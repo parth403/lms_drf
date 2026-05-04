@@ -1,7 +1,3 @@
-// ============================================
-// Leave Approval Functions (Manager)
-// ============================================
-
 /**
  * Open approve/reject modal
  */
@@ -21,8 +17,6 @@ function openApproveRejectModal(leaveId, employeeName, leaveType, startDate, end
  */
 async function approveLeave() {
     const leaveId = document.getElementById('action-leave-id').value;
-    console.log('Approving leave ID:', leaveId);
-
     if (!leaveId) {
         showAlert('Unable to approve leave: invalid request ID.', 'danger');
         return;
@@ -38,22 +32,17 @@ async function approveLeave() {
             body: JSON.stringify({ status: 'approved' })
         });
 
-        console.log('Approve response status:', response.status);
-
         if (response.ok) {
             const result = await response.json();
-            console.log('Approve result:', result);
             showAlert('Leave approved successfully!', 'success');
             approveRejectModal.hide();
             loadPendingLeaves();
             loadLeaveHistory();
         } else {
             const error = await response.json();
-            console.log('Approve error response:', error);
             showAlert('Error approving leave: ' + (error.detail || 'Unknown error'), 'danger');
         }
     } catch (error) {
-        console.error('Error approving leave:', error);
         showAlert('Error approving leave', 'danger');
     }
 }
@@ -84,18 +73,15 @@ async function rejectLeave() {
 
         if (response.ok) {
             const result = await response.json();
-            console.log('Reject result:', result);
             showAlert('Leave rejected successfully!', 'success');
             approveRejectModal.hide();
             loadPendingLeaves();
             loadLeaveHistory();
         } else {
             const error = await response.json();
-            console.log('Reject error response:', error);
             showAlert('Error rejecting leave: ' + (error.detail || 'Unknown error'), 'danger');
         }
     } catch (error) {
-        console.error('Error rejecting leave:', error);
         showAlert('Error rejecting leave', 'danger');
     }
 }

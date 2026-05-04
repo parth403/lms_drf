@@ -16,9 +16,6 @@ function initializeAuth() {
 async function getCurrentUser() {
     try {
         const token = localStorage.getItem('access_token');
-        console.log('Token exists:', !!token);
-        console.log('Token value:', token ? token.substring(0, 20) + '...' : 'null');
-
         const response = await fetch('/user/profile/', {
             method: 'GET',
             headers: {
@@ -31,11 +28,6 @@ async function getCurrentUser() {
             localStorage.removeItem('access_token');
             localStorage.removeItem('refresh_token');
             window.location.href = '/login/';
-            return;
-        }
-
-        if (response.status === 403) {
-            showAlert('Access denied. Please contact administrator.');
             return;
         }
 
@@ -55,39 +47,21 @@ async function getCurrentUser() {
 }
 
 /**
- * Update UI with user information
+ * Update user display information in the dashboard
  */
 function updateUserDisplay() {
-    try {
-        if (!currentUser) {
-            console.error('Current user is null');
-            return;
-        }
+    const userNameElement = document.getElementById('user-name');
+    const userRoleElement = document.getElementById('user-role');
 
-        const firstName = currentUser.firstName || currentUser.first_name || currentUser.username || 'User';
-        const lastName = currentUser.lastName || currentUser.last_name || '';
-        const userNameElement = document.getElementById('user-name');
-        const userRoleElement = document.getElementById('user-role');
+    if (userNameElement) {
+        const displayName = currentUser.firstName && currentUser.lastName 
+            ? `${currentUser.firstName} ${currentUser.lastName}`
+            : currentUser.username || 'User';
+        userNameElement.textContent = displayName;
+    }
 
-        if (userNameElement) userNameElement.textContent = firstName;
-        if (userRoleElement) userRoleElement.textContent = currentUser.role || 'Employee';
-
-        // Profile section
-        const profileUsername = document.getElementById('profile-username');
-        const profileEmail = document.getElementById('profile-email');
-        const profileFirstName = document.getElementById('profile-first-name');
-        const profileLastName = document.getElementById('profile-last-name');
-        const profileRole = document.getElementById('profile-role');
-
-        if (profileUsername) profileUsername.value = currentUser.username || '';
-        if (profileEmail) profileEmail.value = currentUser.email || '';
-        if (profileFirstName) profileFirstName.value = firstName || '';
-        if (profileLastName) profileLastName.value = lastName || '';
-        if (profileRole) profileRole.value = currentUser.role || '';
-
-        console.log('User display updated successfully');
-    } catch (error) {
-        console.error('Error updating user display:', error);
+    if (userRoleElement) {
+        userRoleElement.textContent = (currentUser.role || 'user').charAt(0).toUpperCase() + (currentUser.role || 'user').slice(1);
     }
 }
 
