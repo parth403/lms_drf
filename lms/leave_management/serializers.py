@@ -1,6 +1,7 @@
 from leave_management.models import LeaveType,LeaveBalance,LeaveRequest,LeaveLog
 from user_mgmt.models import User
 from rest_framework import serializers
+from django.db.models import Q
 
 # Leave Request Serializer for creating a leave request by employee
 class LeaveRequestSerializer(serializers.ModelSerializer):
@@ -50,6 +51,18 @@ class LeaveRequestCreateSerializer(serializers.ModelSerializer):
         if data.get('start_date') and data.get('end_date'):
             if data['start_date'] > data['end_date']:
                 raise serializers.ValidationError('Start date should be less than end date')
+            
+            # Check for overlapping leave requests for the same user
+            user = self.context['request'].user
+            overlapping_leaves = LeaveRequest.objects.filter(
+                user=user,
+                start_date__lte=data['end_date'],
+                end_date__gte=data['start_date']
+            ).exclude(status='rejected')
+            
+            if overlapping_leaves.exists():
+                raise serializers.ValidationError('You already have a leave request for these dates')
+        
         return data
 
 class LeaveRequestUpdateSerializer(serializers.ModelSerializer):
@@ -60,6 +73,7 @@ class LeaveRequestUpdateSerializer(serializers.ModelSerializer):
         model=LeaveRequest
         fields=['id','start_date','end_date','reason']
         read_only_fields=['id']
+
     
     def validate(self, data):
         if data.get('start_date') and data.get('end_date'):
