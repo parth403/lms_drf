@@ -8,7 +8,3 @@ class IsEmployee(BasePermission):
 class IsManager(BasePermission):
     def has_permission(self, request, view):
         return request.user.role==ROLE_MANAGER
-
-class IsAdmin(BasePermission):
-    def has_permission(self, request, view):
-        return request.user.all()

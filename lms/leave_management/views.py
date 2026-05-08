@@ -5,7 +5,7 @@ from leave_management.models import LeaveRequest,LeaveLog,LeaveBalance,LeaveType
 from .serializers import LeaveRequestSerializer,LeaveLogSerializer,LeaveBalanceSerializer,LeaveRequestCreateSerializer,LeaveTypeSerializer
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
-from leave_management.permissions import IsEmployee,IsManager,IsAdmin
+from leave_management.permissions import IsManager
 from django.db.models import Q
 from rest_framework.response import Response
 from lms.common.constants import (ROLE_CHOICES,ROLE_ADMIN,ROLE_EMPLOYEE,ROLE_MANAGER,STATUS_PENDING,STATUS_APPROVED,STATUS_REJECTED,ACTION_APPLIED)
@@ -42,7 +42,7 @@ class LeaveRequestCreateView(generics.CreateAPIView):
             action=ACTION_APPLIED,
             approved_by=self.request.user
         )
-        #send_leave_request_email.delay(leave_request.id)
+        send_leave_request_email.delay(leave_request.id)
 
     def create(self, request, *args, **kwargs):
         serializer=self.get_serializer(data=request.data)
@@ -173,5 +173,3 @@ class LeaveTypeListView(generics.ListAPIView):
     queryset=LeaveType.objects.all()
     serializer_class=LeaveTypeSerializer
     permission_classes=[IsAuthenticated]
-
-
