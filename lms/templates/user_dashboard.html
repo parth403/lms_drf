@@ -1,0 +1,307 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leave Management System - Dashboard</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+            <i class="bi bi-calendar-check"></i> LMS
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+            aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link nav-item-link active" data-section="dashboard" href="#">Dashboard</a>
+                </li>
+                <li class="nav-item employee-menu" style="display: none;">
+                    <a class="nav-link nav-item-link" data-section="apply-leave" href="#">Apply Leave</a>
+                </li>
+                <li class="nav-item employee-menu" style="display: none;">
+                    <a class="nav-link nav-item-link" data-section="my-leaves" href="#">My Leaves</a>
+                </li>
+                <li class="nav-item employee-menu" style="display: none;">
+                    <a class="nav-link nav-item-link" data-section="leave-balance" href="#">Leave Balance</a>
+                </li>
+                <li class="nav-item manager-menu" style="display: none;">
+                    <a class="nav-link nav-item-link" data-section="pending-leaves" href="#">Pending Leaves</a>
+                </li>
+                <li class="nav-item manager-menu" style="display: none;">
+                    <a class="nav-link nav-item-link" data-section="leave-history" href="#">Leave History</a>
+                </li>
+            </ul>
+            <button class="btn btn-outline-danger btn-sm" onclick="logout()">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </button>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <div id="alert-container"></div>
+
+    <section id="dashboard" class="content-section active">
+        <h2>Dashboard</h2>
+        <div class="row mb-3">
+            <div class="col-6 col-md-3 mb-2">
+                <div class="p-3 border rounded text-center">
+                    <div>Total Leaves</div>
+                    <div id="total-leaves-card" class="fs-3">0</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3 mb-2">
+                <div class="p-3 border rounded text-center">
+                    <div>Used Leaves</div>
+                    <div id="used-leaves-card" class="fs-3">0</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3 mb-2">
+                <div class="p-3 border rounded text-center">
+                    <div>Remaining</div>
+                    <div id="remaining-leaves-card" class="fs-3">0</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3 mb-2 manager-only" style="display:none;">
+                <div class="p-3 border rounded text-center">
+                    <div>Pending</div>
+                    <div id="pending-leaves-card" class="fs-3">0</div>
+                </div>
+            </div>
+        </div>
+
+        <h5>Recent Leave Requests</h5>
+        <table class="table table-bordered table-sm">
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Days</th>
+                    <th>Status</th>
+                    <th>Applied On</th>
+                </tr>
+            </thead>
+            <tbody id="recent-leaves-tbody">
+                <tr>
+                    <td colspan="6" class="text-center text-muted">No leave requests yet</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section id="apply-leave" class="content-section employee-content" style="display:none;">
+        <h2>Apply Leave</h2>
+        <form id="apply-leave-form" onsubmit="applyLeave(event)">
+            <div class="mb-3">
+                <label for="leave-type" class="form-label">Leave Type</label>
+                <select id="leave-type" class="form-select" required>
+                    <option value="">Select Leave Type</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="start-date" class="form-label">From Date</label>
+                <input id="start-date" type="date" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="end-date" class="form-label">To Date</label>
+                <input id="end-date" type="date" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="reason" class="form-label">Reason</label>
+                <textarea id="reason" class="form-control" rows="3" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </section>
+
+    <section id="my-leaves" class="content-section employee-content" style="display:none;">
+        <h2>My Leaves</h2>
+        <table class="table table-bordered table-sm">
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Days</th>
+                    <th>Status</th>
+                    <th>Reason</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="my-leaves-tbody">
+                <tr>
+                    <td colspan="7" class="text-center text-muted">No leave requests found</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section id="leave-balance" class="content-section employee-content" style="display:none;">
+        <h2>Leave Balance</h2>
+        <table class="table table-bordered table-sm">
+            <thead>
+                <tr>
+                    <th>Leave Type</th>
+                    <th>Total</th>
+                    <th>Used</th>
+                    <th>Remaining</th>
+                </tr>
+            </thead>
+            <tbody id="leave-balance-tbody">
+                <tr>
+                    <td colspan="4" class="text-center text-muted">No leave balance data</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section id="pending-leaves" class="content-section manager-content" style="display:none;">
+        <h2>Pending Leaves</h2>
+        <table class="table table-bordered table-sm">
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Type</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Days</th>
+                    <th>Reason</th>
+                    <th>Applied On</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="pending-leaves-tbody">
+                <tr>
+                    <td colspan="8" class="text-center text-muted">No pending leave requests</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section id="leave-history" class="content-section manager-content" style="display:none;">
+        <h2>Leave History</h2>
+        <table class="table table-bordered table-sm">
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Type</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Days</th>
+                    <th>Status</th>
+                    <th>Approved By</th>
+                    <th>Applied On</th>
+                </tr>
+            </thead>
+            <tbody id="leave-history-tbody">
+                <tr>
+                    <td colspan="8" class="text-center text-muted">No leave history</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section id="profile" class="content-section" style="display:none;">
+        <h2>Profile</h2>
+        <div class="mb-3">
+            <label class="form-label">Username</label>
+            <input id="profile-username" class="form-control" disabled>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input id="profile-email" class="form-control" disabled>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">First Name</label>
+            <input id="profile-first-name" class="form-control" disabled>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Last Name</label>
+            <input id="profile-last-name" class="form-control" disabled>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Role</label>
+            <input id="profile-role" class="form-control" disabled>
+        </div>
+    </section>
+</div>
+
+<!-- Edit Leave Modal -->
+<div class="modal fade" id="editLeaveModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Leave Request</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-leave-form" onsubmit="updateLeave(event)">
+                    <input type="hidden" id="edit-leave-id">
+                    <div class="mb-3">
+                        <label class="form-label">From Date</label>
+                        <input type="date" class="form-control" id="edit-start-date" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">To Date</label>
+                        <input type="date" class="form-control" id="edit-end-date" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Reason</label>
+                        <textarea class="form-control" id="edit-reason" rows="4"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Update Leave</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Approve/Reject Modal -->
+<div class="modal fade" id="approveRejectModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Leave Request Action</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="leave-details" class="mb-3"></div>
+                <div class="row gap-2">
+                    <div class="col-6">
+                        <button type="button" class="btn btn-success w-100" onclick="approveLeave()">
+                            <i class="bi bi-check-circle"></i> Approve
+                        </button>
+                    </div>
+                    <div class="col-6">
+                        <button type="button" class="btn btn-danger w-100" onclick="rejectLeave()">
+                            <i class="bi bi-x-circle"></i> Reject
+                        </button>
+                    </div>
+                </div>
+                <input type="hidden" id="action-leave-id">
+            </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'js/auth.js' %}"></script>
+<script src="{% static 'js/leave-init.js' %}"></script>
+<script src="{% static 'js/leave-dashboard.js' %}"></script>
+<script src="{% static 'js/leave-data.js' %}"></script>
+<script src="{% static 'js/leave-crud.js' %}"></script>
+<script src="{% static 'js/leave-approval.js' %}"></script>
+<script src="{% static 'js/dashboard.js' %}"></script>
+
+</body>
+</html>

@@ -1,0 +1,14 @@
+Users
+    - Registration (RegisterSerializer)
+    - Login (LoginSerializer)
+    - Logout (LogoutSerializer)
+    - View their details (UserDetailSerializer)
+
+
+Leave Management 
+    - LeaveRequestSerializer
+    - LeaveRequestCreateSerializer
+    - LeaveTypeSerializer
+    - LeaveLogSerializer
+    - LeaveBalanceSerializer
+
